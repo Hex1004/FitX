@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitX</title>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="app.js">
+</head>
+<body>
+
+  <!-- Step 1: Select Gender -->
+  <div class="form-step active" id="step1">
+    <h2>Select Your Gender</h2>
+    <select id="gender">
+      <option value="">-- Select Gender --</option>
+      <option  class="select" value="male">Male</option>
+      <option class="select" value="female">Female</option>
+    </select>
+    <button id="next1">Next</button>
+  </div>
+
+  <!-- Step 2: Select Weight and Height -->
+  <div class="form-step" id="step2">
+    <h2>Enter Your Weight and Height</h2>
+    <input type="number" id="weight" placeholder="Weight (kg)">
+    <input type="number" id="height" placeholder="Height (cm)">
+    <button id="next2">Next</button>
+  </div>
+
+  <!-- Step 3: Select Goal -->
+  <div class="form-step" id="step3">
+    <h2>Select Your Goal</h2>
+    <select id="goal">
+      <option value="">-- Select Goal --</option>
+      <option value="bulk">Bulk</option>
+      <option value="cut">Cut</option>
+    </select>
+    <button id="next3">Next</button>
+  </div>
+
+  <!-- Step 4: Select Activity Level -->
+  <div class="form-step" id="step4">
+    <h2>Select Your Activity Level</h2>
+    <select id="activity">
+      <option value="">-- Select Activity Level --</option>
+      <option value="low">Low Activity</option>
+      <option value="moderate">Moderate Activity</option>
+      <option value="high">High Activity</option>
+    </select>
+    <button id="next4">Next</button>
+  </div>
+
+  <!-- Step 5: Show Calorie and Nutritional Needs -->
+  <div class="form-step" id="step5">
+    <h2>Your Daily Needs</h2>
+    <div class="circular-diagram">
+      <div id="calories"><span></span></div>
+      <div id="protein"><span></span></div>
+      <div id="carbs"><span></span></div>
+      <div id="water"><span></span></div>
+    </div>
+
+  <script>
+    let currentStep = 1;
+const genderEl = document.getElementById('gender');
+const weightEl = document.getElementById('weight');
+const heightEl = document.getElementById('height');
+const goalEl = document.getElementById('goal');
+const activityEl = document.getElementById('activity');
+
+let userData = {};
+let dailyNeeds = {};
+
+// Step 1: Gender selection
+document.getElementById('next1').addEventListener('click', () => {
+  const gender = genderEl.value;
+  if (gender) {
+    userData.gender = gender;
+    nextStep();
+  } else {
+    alert("Please select your gender.");
+  }
+});
+
+// Step 2: Weight and Height
+document.getElementById('next2').addEventListener('click', () => {
+  const weight = weightEl.value;
+  const height = heightEl.value;
+  if (weight && height) {
+    userData.weight = weight;
+    userData.height = height;
+    nextStep();
+  } else {
+    alert("Please enter your weight and height.");
+  }
+});
+
+// Step 3: Goal
+document.getElementById('next3').addEventListener('click', () => {
+  const goal = goalEl.value;
+  if (goal) {
+    userData.goal = goal;
+    nextStep();
+  } else {
+    alert("Please select your goal.");
+  }
+});
+
+// Step 4: Activity Level
+document.getElementById('next4').addEventListener('click', () => {
+  const activity = activityEl.value;
+  if (activity) {
+    userData.activity = activity;
+    calculateNeeds();
+    nextStep();
+  } else {
+    alert("Please select your activity level.");
+  }
+});
+
+// Move to the next step
+function nextStep() {
+  document.getElementById(`step${currentStep}`).classList.remove('active');
+  currentStep++;
+  document.getElementById(`step${currentStep}`).classList.add('active');
+}
+
+// Calculate calorie and nutritional needs
+function calculateNeeds() {
+  const baseCalories = 2000;  // Base calories for calculations
+  let calories = baseCalories;
+
+  // Adjust calories based on gender
+  if (userData.gender === 'male') {
+    calories += 200;
+  } else {
+    calories -= 200;
+  }
+
+  // Adjust calories based on activity level
+  if (userData.activity === 'moderate') {
+    calories += 300;
+  } else if (userData.activity === 'high') {
+    calories += 500;
+  }
+
+  // Set nutritional needs
+  const protein = Math.round(userData.weight * 1.6);
+  const carbs = Math.round(calories * 0.5 / 4);
+  const water = Math.round(userData.weight * 0.033);  // Liters of water per day
+
+  // Store daily needs
+  dailyNeeds = { calories, protein, carbs, water };
+
+  // Update circular diagrams with percentage values
+  updateCircularDiagram('calories', calories, 4000);  // Assuming max 4000 kcal
+  updateCircularDiagram('protein', protein, 250);  // Max 250g protein
+  updateCircularDiagram('carbs', carbs, 500);  // Max 500g carbs
+  updateCircularDiagram('water', water, 5);  // Max 5L water
+
+  // Update display text
+  document.getElementById('calories').querySelector('span').textContent = `${calories} kcal`;
+  document.getElementById('protein').querySelector('span').textContent = `${protein} g Protein`;
+  document.getElementById('carbs').querySelector('span').textContent = `${carbs} g Carbs`;
+  document.getElementById('water').querySelector('span').textContent = `${water} L Water`;
+}
+
+// Update the circular diagram with the correct progress percentage
+function updateCircularDiagram(id, value, maxValue) {
+  const percentage = (value / maxValue) * 100;
+  document.getElementById(id).style.setProperty('--progress', `${percentage}%`);
+}
+
+  </script>
+
+</body>
+</html>
